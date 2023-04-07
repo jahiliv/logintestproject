@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from authentication.models import Admins
+from django.contrib import messages
 import re
 
 def home(request):
@@ -18,17 +19,26 @@ def signup(request):
         # print(username, email, password)
         confirm_password = request.POST.get('confirmpassword')
 
-        if len(username) < 4 :
-            return HttpResponse("user name length atleast 4")
+        if((len(username)==0) or (len(email)==0) or (len(password)==0) or (len(confirm_password)==0)):
+            messages.info(request,"The field can not be empty")
+            
+        elif len(username) < 4 :
+            messages.error(request,"user name length atleast 4")
+            # return redirect('register')
+            # return HttpResponse("user name length atleast 4")
         elif(not password == confirm_password):
-            return HttpResponse("The password does not match")
+            messages.error(request,"The password does not match")
+            # return redirect('register')
+            # return HttpResponse("The password does not match")
         
         # if not error_msg:
-        data = Admins(username=username, 
+        else : 
+            data = Admins(username=username, 
                         email=email, 
                         password=password)
             # print(data)
-        data.registration()
+            data.registration()
+            messages.success(request,"Register Succefully")
 
             # if success == True:
             #     return HttpResponse("success")
